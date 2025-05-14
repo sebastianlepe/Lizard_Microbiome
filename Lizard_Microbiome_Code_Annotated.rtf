@@ -1,0 +1,227 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2636
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red30\green40\blue49;\red239\green241\blue241;
+\red26\green34\blue40;\red239\green239\blue239;\red23\green30\blue37;\red235\green238\blue237;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c15294\c20784\c25098;\cssrgb\c94902\c95686\c95686;
+\cssrgb\c13333\c17647\c20784;\cssrgb\c94902\c94902\c94902;\cssrgb\c11765\c15686\c19216;\cssrgb\c93725\c94510\c94510;}
+\margl1440\margr1440\vieww28600\viewh14900\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs22 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 ## This code creates a visualization of the file demux.qza\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime demux summarize \\\cb1 \
+\cb4 --i-data demux.qza \\\cb1 \
+\cb4 --o-visualization demux.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb6 \outl0\strokewidth0 \strokec5 ##This code trims the forward and reverse reads at our desired length\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime dada2 denoise-paired \\\cb1 \
+\cb4 --i-demultiplexed-seqs demux.qza \\\cb1 \
+\cb4 --p-trunc-len-f 270 \\\cb1 \
+\cb4 --p-trim-left-f 0 \\\cb1 \
+\cb4 --p-trunc-len-r 250 \\\cb1 \
+\cb4 --p-trim-left-r 0 \\\cb1 \
+\cb4 --o-representative-sequences rep-seqs.qza \\\cb1 \
+\cb4 --o-table table.qza \\\cb1 \
+\cb4 --o-denoising-stats stats.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb1 \outl0\strokewidth0 \strokec5 ## This creates 2 visualizations for the table.qza and reps-sees.qza files\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime feature-table summarize \\\cb1 \
+\cb4 --i-table table.qza \\\cb1 \
+\cb4 --o-visualization table.qzv \\\cb1 \
+\cb4 --m-sample-metadata-file metadata.txt\cb1 \
+\cb4 qiime feature-table tabulate-seqs \\\cb1 \
+\cb4 --i-data rep-seqs.qza \\\cb1 \
+\cb4 --o-visualization rep-seqs.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb1 \outl0\strokewidth0 \strokec5 ## This code creates a classifier for the taxonomy\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 wget \\\
+  -O "gg-13-8-99-515-806-nb-classifier.qza" \\\
+  "https://data.qiime2.org/classifiers/sklearn-1.4.2/greengenes/gg-13-8-99-515-806-nb-classifier.qza"\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This creates the taxonomy.qza which then allows us to make the visual for the taxonomy\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime feature-classifier classify-sklearn \\\cb1 \
+\cb4 --i-classifier gg-13-8-99-515-806-nb-classifier.qza \\\cb1 \
+\cb4 --i-reads rep-seqs.qza \\\cb1 \
+\cb4 --o-classification taxonomy.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This code then creates the visual\'a0\cf0 \strokec2 for taxonomy\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime metadata tabulate \\\cb1 \
+\cb4 --m-input-file taxonomy.qza \\\cb1 \
+\cb4 --o-visualization taxonomy.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This code filters for mitochondria and chloroplasts\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime taxa filter-table \\\cb1 \
+\cb4 --i-table table.qza \\\cb1 \
+\cb4 --i-taxonomy taxonomy.qza \\\cb1 \
+\cb4 --p-include p__ \\\cb1 \
+\cb4 --p-exclude mitochondria,chloroplast \\\cb1 \
+\cb4 --o-filtered-table table-with-phyla-no-mitochondria-chloroplast.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This code will exclude K Archea\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime taxa filter-table \\\cb1 \
+\cb4 --i-table table-with-phyla-no-mitochondria-chloroplast.qza \\\cb1 \
+\cb4 --i-taxonomy taxonomy.qza \\\cb1 \
+\cb4 --p-exclude "k__Archaea" \\\cb1 \
+\cb4 --o-filtered-table table-with-phyla-no-mitochondria-chloroplasts-archaea.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This code will exclude K eukaryote\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime taxa filter-table \\\cb1 \
+\cb4 --i-table table-with-phyla-no-mitochondria-chloroplasts-archaea.qza \\\cb1 \
+\cb4 --i-taxonomy taxonomy.qza \\\cb1 \
+\cb4 --p-exclude "k__Eukaryota" \\\cb1 \
+\cb4 --o-filtered-table table-with-phyla-no-mitochondria-chloroplasts-archaea-eukaryota.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This code will filter out mitochondria and chloroplasts\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime taxa filter-seqs \\\cb1 \
+\cb4 --i-sequences rep-seqs.qza \\\cb1 \
+\cb4 --i-taxonomy taxonomy.qza \\\cb1 \
+\cb4 --p-include p__ \\\cb1 \
+\cb4 --p-exclude mitochondria,chloroplast \\\cb1 \
+\cb4 --o-filtered-sequences rep-seqs-with-phyla-no-mitochondria-chloroplast.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## Filters phyla with no mitochondria and chloroplasts\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime taxa filter-seqs \\\cb1 \
+\cb4 --i-sequences rep-seqs-with-phyla-no-mitochondria-chloroplast.qza \\\cb1 \
+\cb4 --i-taxonomy taxonomy.qza \\\cb1 \
+\cb4 --p-exclude "k__Archaea" \\\cb1 \
+\cb4 --o-filtered-sequences rep-seqs-with-phyla-no-mitochondria-chloroplasts-archaea.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This one will give us the final filtered data\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime taxa filter-seqs \\\cb1 \
+\cb4 --i-sequences rep-seqs-with-phyla-no-mitochondria-chloroplasts-archaea.qza \\\cb1 \
+\cb4 --i-taxonomy taxonomy.qza \\\cb1 \
+\cb4 --p-exclude "k__Eukaryota" \\\cb1 \
+\cb4 --o-filtered-sequences rep-seqs-with-phyla-no-mitochondria-chloroplasts-archaea-eukaryota.qza\cb1 \
+\cb4 \
+## this code will clean up the file names \
+mv table-with-phyla-no-mitochondria-chloroplasts-archaea-eukaryota.qza filtered-table.qza\
+\
+mv rep-seqs-with-phyla-no-mitochondria-chloroplasts-archaea-eukaryota.qza filtered-rep-seqs.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This creates a bar graph visual\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime taxa barplot \\\cb1 \
+\cb4 --i-table filtered-table.qza \\\cb1 \
+\cb4 --i-taxonomy taxonomy.qza \\\cb1 \
+\cb4 --m-metadata-file metadata.txt \\\cb1 \
+\cb4 --o-visualization taxa-bar-plots.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This one creates a phylogenetic rooted tree\'a0\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime phylogeny align-to-tree-mafft-fasttree \\\cb1 \
+\cb4 --i-sequences filtered-rep-seqs.qza \\\cb1 \
+\cb4 --o-alignment aligned-rep-seqs.qza \\\cb1 \
+\cb4 --o-masked-alignment masked-aligned-rep-seqs.qza \\\cb1 \
+\cb4 --o-tree unrooted-tree.qza \\\cb1 \
+\cb4 --o-rooted-tree rooted-tree.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## Creates a visual for the filtered table\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime feature-table summarize \\\cb1 \
+\cb4 --i-table filtered-table.qza \\\cb1 \
+\cb4 --o-visualization filtered-table.qzv \\\cb1 \
+\cb4 --m-sample-metadata-file metadata.txt\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This one gives us our diversity results\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime diversity core-metrics-phylogenetic --i-phylogeny rooted-tree.qza --i-table filtered-table.qza --p-sampling-depth 1855 --m-metadata-file metadata.txt --output-dir diversity-metrics-results\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This gives us a observed group significance\'a0\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime diversity alpha-group-significance \\\cb1 \
+\cb4 --i-alpha-diversity diversity-metrics-results/observed_features_vector.qza \\\cb1 \
+\cb4 --m-metadata-file metadata.txt \\\cb1 \
+\cb4 --o-visualization diversity-metrics-results/observed-features-group-significance.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This gives us a observed group significance\'a0that is able to be viewed\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime diversity alpha-group-significance \\\cb1 \
+\cb4 --i-alpha-diversity diversity-metrics-results/observed_features_vector.qza \\\cb1 \
+\cb4 --m-metadata-file metadata.txt \\\cb1 \
+\cb4 --o-visualization diversity-metrics-results/observed-features-group-significance.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This gives us a Shannon group significance\'a0\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime diversity alpha-group-significance \\\cb1 \
+\cb4 --i-alpha-diversity diversity-metrics-results/shannon_vector.qza \\\cb1 \
+\cb4 --m-metadata-file metadata.txt \\\cb1 \
+\cb4 --o-visualization diversity-metrics-results/shannon-group-significance.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This gives us a bray Curtis significance for sex\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime diversity beta-group-significance \\\cb1 \
+\cb4 --i-distance-matrix diversity-metrics-results/bray_curtis_distance_matrix.qza \\\cb1 \
+\cb4 --m-metadata-file metadata.txt \\\cb1 \
+\cb4 --m-metadata-column Sex \\\cb1 \
+\cb4 --o-visualization diversity-metrics-results/bray-curtis-sex-significance.qzv \\\cb1 \
+\cb4 --p-pairwise\
+\
+## There was not enough data to compare the species \
+qiime diversity beta-group-significance \\\cb1 \
+\cb4 --i-distance-matrix diversity-metrics-results/bray_curtis_distance_matrix.qza \\\cb1 \
+\cb4 --m-metadata-file metadata.txt \\\cb1 \
+\cb4 --m-metadata-column Species \\\cb1 \
+\cb4 --o-visualization diversity-metrics-results/bray-curtis-species-significance.qzv \\\cb1 \
+\cb4 --p-pairwise\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This code creates a weighted unifrac significance for sex\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime diversity beta-group-significance \\\
+  --i-distance-matrix diversity-metrics-results/weighted_unifrac_distance_matrix.qza \\\
+  --m-metadata-file metadata.txt \\\
+  --m-metadata-column Sex \\\
+  --o-visualization diversity-metrics-results/weighted-unifrac-Sex.qzv\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb8 \outl0\strokewidth0 \strokec7 ## This code creates a .qza ancombc file\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime composition ancombc \\\
+  --i-table filtered-table.qza \\\
+  --m-metadata-file metadata.txt \\\
+  --p-formula 'Sex' \\\
+  --o-differentials ancombc-sex.qza\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb1 \outl0\strokewidth0 \strokec7 ## This code creates the visual file for the ancombc file\cf3 \cb4 \outl0\strokewidth0 \
+\pard\pardeftab720\partightenfactor0
+\cf3 qiime composition da-barplot \\\
+  --i-data ancombc-sex.qza \\\
+  --p-significance-threshold 0.05 \\\
+  --o-visualization da-barplot-sex.qzv\
+\
+\
+\
+}
